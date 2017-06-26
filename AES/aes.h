@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include <stdint.h>
 
+#include "common/common.h"
+#include "common/common_aes.h"
 
 
 #endif //AES_AES_H
