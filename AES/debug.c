@@ -21,6 +21,34 @@ void print_state(uint8_t *state, int Nb)
     }
 }
 
+void print_states(uint8_t *states, int total_length, int max_per_line, bool transpose)
+{
+    int i, j, k, temp, idx;
+    int bloc_number = total_length / STATE_LENGTH;
+
+    printf("Print states:\n");
+    for(i = 0; i < NUMBER_ROWS; i++)
+    {
+        for(j = 0; j < bloc_number; j++)
+        {
+            if((max_per_line > 0) && (j * NUMBER_ROWS + k + N_B >= max_per_line))
+                break;
+            for(k = 0; k < N_B; k++)
+            {
+                if(!transpose)
+                    idx = (i * N_B) + (j * STATE_LENGTH) + k;
+                else
+                    idx = i + (j * STATE_LENGTH) + (k * N_B);
+                temp = states[idx];
+                printf("%2x ", temp);
+            }
+            if(j < bloc_number - 1)
+                printf("| ");
+        }
+        printf("\n");
+    }
+}
+
 bool is_states_equal(uint8_t *s1, uint8_t *s2, int Nb, bool show_dif)
 {
     int i, j;

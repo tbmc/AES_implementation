@@ -4,8 +4,8 @@
 
 #include "test_common.h"
 
-#include "../AES/common/debug.h"
-#include "../AES/common/common_aes.h"
+#include "../AES/debug.h"
+#include "../AES/common_aes.h"
 
 
 void test_sub_bytes()

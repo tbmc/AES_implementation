@@ -3,6 +3,7 @@
 //
 
 #include "common_aes.h"
+
 #include "common.h"
 #include "common_math.h"
 
@@ -49,56 +50,29 @@ uint8_t sub_byte(uint8_t input)
 
 void sub_bytes(uint8_t *state)
 {
-    uint8_t temp;
-    int r, c;
-    for(c = 0; c < N_B; c++) {
-        for(r = 0; r < NUMBER_ROWS; r++) {
-            temp = GET_MULTI_DIM(state, r, c, N_B);
-            SET_MULTI_DIM(state, r, c, N_B, sub_byte(temp));
-        }
-    }
+    int i;
+    for(i = 0; i < STATE_LENGTH; i++)
+        state[i] = sub_byte(state[i]);
 }
 
-void shift_row(uint8_t *row, int n_to_shift)
+void shift_row(uint8_t *row, int nbr_to_shift)
 {
-    int i, idx;
-    uint8_t *row_cpy;
-
-    if(n_to_shift == 0)
-        return;
-
-    row_cpy = malloc(N_B);
-    memcpy(row_cpy, row, N_B);
-
-    idx = n_to_shift - 1;
-    for(i = N_B - 1; i >= 0; i--)
+    int i, j, cols = N_B - 1;
+    uint8_t temp;
+    for(i = 0; i < nbr_to_shift; i++)
     {
-        row[i] = row_cpy[idx];
-        idx = (idx - 1 + N_B) % N_B;
+        temp = row[0];
+        for(j = 0; j < cols; j++)
+            row[j] = row[j + 1];
+        row[cols] = temp;
     }
-
-    free(row_cpy);
 }
 
 void shift_rows(uint8_t *state)
 {
-    int r, c, idx;
-    uint8_t *row_cpy = malloc(N_B), *row;
-    for(r = 1; r < NUMBER_ROWS; r++)
-    {
-        /*
-        row = state + (r * N_B);
-        memcpy(row_cpy, row, N_B);
-        idx = r - 1;
-        for(c = N_B - 1; c >= 0; c--)
-        {
-            row[c] = row_cpy[idx];
-            idx = (idx - 1 + N_B) % N_B;
-        }
-        */
-        shift_row(state + (r * N_B), r);
-    }
-    free(row_cpy);
+    int i;
+    for(i = 1; i < NUMBER_ROWS; i++)
+        shift_row(state + (i * N_B), i);
 }
 
 
@@ -106,7 +80,10 @@ void mix_column(uint8_t *column)
 {
     uint8_t cpy[NUMBER_ROWS], temp, mn;
     int i, j;
-    memcpy(cpy, column, NUMBER_ROWS);
+    // memcpy(cpy, column, NUMBER_ROWS);
+    for(i = 0; i < NUMBER_ROWS; i++)
+        cpy[i] = column[i];
+
     for(i = 0; i < NUMBER_ROWS; i++)
     {
         temp = 0;
@@ -122,30 +99,32 @@ void mix_column(uint8_t *column)
 void mix_columns(uint8_t *state)
 {
     int r, c;
-    uint8_t *mix;
-    mix = malloc(NUMBER_ROWS);
+    uint8_t mix[NUMBER_ROWS];
 
     for(c = 0; c < N_B; c++)
     {
         for(r = 0; r < NUMBER_ROWS; r++)
             mix[r] = GET_MULTI_DIM(state, r, c, N_B);
-        // matrix_int_multiply_vector(MIX_MATRIX, before_mix, NUMBER_ROWS, NUMBER_ROWS, after_mix);
-        mix_column(mix);
         for(r = 0; r < NUMBER_ROWS; r++)
             SET_MULTI_DIM(state, r, c, N_B, mix[r]);
     }
-
-    free(mix);
 }
 
 void add_round_key(uint8_t *state, uint8_t *round_key)
 {
-    int total = NUMBER_ROWS * N_B, i;
-    for(i = 0; i < total; i++)
+    int i;
+    for(i = 0; i < STATE_LENGTH; i++)
         state[i] ^= round_key[i];
 }
 
-
+void aes_round(uint8_t *state, uint8_t round_key, bool last_round)
+{
+    sub_bytes(state);
+    shift_rows(state);
+    if(!last_round)
+        mix_columns(state);
+    add_round_key(state, round_key);
+}
 
 
 

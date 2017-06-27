@@ -91,6 +91,20 @@ uint8_t galois_multiplication(uint8_t a, uint8_t b)
 }
 
 
+void matrix_transpose(uint8_t *out, const uint8_t *state, int rows, int cols)
+{
+    int i, j;
+    uint8_t temp;
+    for(i = 0; i < rows; i++)
+    {
+        for(j = 0; j < cols; j++)
+        {
+            temp = GET_MULTI_DIM(state, i, j, cols);
+            SET_MULTI_DIM(out, j, i, rows, temp);
+        }
+    }
+}
+
 
 
 

@@ -16,4 +16,6 @@ void matrix_int_multiply_vector(uint8_t *matrix, uint8_t *vector, int n_row, int
 uint8_t galois_multiplication(uint8_t a, uint8_t b);
 
 
+void matrix_transpose(uint8_t *out, const uint8_t *state, int rows, int cols);
+
 #endif //AES_MATRIX_MATH_H
