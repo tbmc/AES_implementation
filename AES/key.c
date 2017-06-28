@@ -51,13 +51,6 @@ void key_sub_word(uint8_t *row)
         row[i] = sub_byte(row[i]);
 }
 
-/*
-uint32_t rcon(int round, enum KeySize key_size)
-{
-    int r = (round / (key_size / 4)) - 1;
-    return RCON_VALUES[r];
-}
-*/
 uint8_t rcon(uint8_t num)
 {
     return RCON_VALUES[num];
